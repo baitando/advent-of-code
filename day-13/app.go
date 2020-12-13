@@ -1,0 +1,161 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"log"
+	"os"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+)
+
+func main() {
+	// Original input on https://adventofcode.com/2020/day/13/input
+	file, err := os.Open("day-13/input.txt")
+	check(err)
+	input, err := readInput(file)
+	check(err)
+
+	//Part 1
+	start := time.Now()
+	part1(input)
+	elapsed := time.Since(start)
+	log.Printf("Part 1 calculation took %s\n\n", elapsed)
+
+	//Part 2
+	start = time.Now()
+	part2(input)
+	elapsed = time.Since(start)
+	log.Printf("Part 2 calculation took %s\n\n", elapsed)
+}
+
+// Read input values
+func readInput(r io.Reader) ([]string, error) {
+	scanner := bufio.NewScanner(r)
+
+	var result []string
+	for scanner.Scan() {
+		x := scanner.Text()
+		result = append(result, x)
+	}
+	return result, scanner.Err()
+}
+
+// Handle error
+func check(e error) {
+	if e != nil {
+		log.Printf("error occured: %s", e)
+		panic(e)
+	}
+}
+
+func part1(input []string) {
+	earliest, err := strconv.Atoi(input[0])
+	check(err)
+	lines := getLines(input[1])
+
+	for currentTime := earliest; ; currentTime++ {
+		for _, line := range lines {
+			if busLeaves(currentTime, line) {
+				log.Printf("Bus %d leaves at %d and is the earliest one", line, currentTime)
+				log.Printf("Result of part 1 is %d", (currentTime-earliest)*line)
+				return
+			}
+		}
+	}
+}
+
+func busLeaves(time int, line int) bool {
+	return time%line == 0
+}
+
+func getLines(input string) []int {
+	lines := strings.Split(input, ",")
+	var filtered []int
+
+	for _, entry := range lines {
+		if entry != "x" {
+			number, err := strconv.Atoi(entry)
+			check(err)
+			filtered = append(filtered, number)
+		}
+	}
+	sort.Ints(filtered)
+	return filtered
+}
+
+func getOffset(line int, definitions []string) int {
+	for offset, definition := range definitions {
+		if definition != "x" {
+			currentLine, err := strconv.Atoi(definition)
+			check(err)
+			if currentLine == line {
+				return offset
+			}
+		}
+	}
+	os.Exit(1)
+	return -1
+}
+
+func lowestMatch(line1 int, offset1 int, line2 int, offset2 int) int {
+	for i := 0; ; i++ {
+		if (i+offset1)%line1 == 0 && (i+offset2)%line2 == 0 {
+			return i
+		}
+	}
+}
+
+func part2(input []string) {
+	ids := make(map[int]int)
+	for i, l := range strings.Split(input[1], ",") {
+		if l == "x" {
+			continue
+		}
+		lineNo, err := strconv.Atoi(l)
+		if err != nil {
+			fmt.Printf("Failed to parse %s\n", l)
+			return
+		}
+		ids[lineNo] = i
+	}
+
+	minValue := 0
+	runningProduct := 1
+	for k, v := range ids {
+		for (minValue+v)%k != 0 {
+			minValue += runningProduct
+		}
+		runningProduct *= k
+	}
+	fmt.Println(minValue)
+}
+
+func part2BruteForce(input []string) {
+	definitions := strings.Split(input[1], ",")
+	startAt := 100000000000000
+
+	for currentTime := startAt; ; currentTime++ {
+		if currentTime%100000 == 0 {
+			log.Printf("At time %d", currentTime)
+		}
+		for offset, definition := range definitions {
+			if definition != "x" {
+				line, err := strconv.Atoi(definition)
+				check(err)
+				if (currentTime+offset)%line != 0 {
+					break
+				} else {
+					if offset == len(definitions)-1 {
+						log.Printf("Part 2 result is time %d", currentTime)
+						return
+					}
+				}
+			}
+		}
+
+	}
+}
