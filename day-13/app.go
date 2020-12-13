@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -111,27 +110,23 @@ func lowestMatch(line1 int, offset1 int, line2 int, offset2 int) int {
 
 func part2(input []string) {
 	ids := make(map[int]int)
-	for i, l := range strings.Split(input[1], ",") {
-		if l == "x" {
-			continue
+	for offset, lineRaw := range strings.Split(input[1], ",") {
+		if lineRaw != "x" {
+			line, err := strconv.Atoi(lineRaw)
+			check(err)
+			ids[line] = offset
 		}
-		lineNo, err := strconv.Atoi(l)
-		if err != nil {
-			fmt.Printf("Failed to parse %s\n", l)
-			return
-		}
-		ids[lineNo] = i
 	}
 
-	minValue := 0
-	runningProduct := 1
+	min := 0
+	product := 1
 	for k, v := range ids {
-		for (minValue+v)%k != 0 {
-			minValue += runningProduct
+		for (min+v)%k != 0 {
+			min += product
 		}
-		runningProduct *= k
+		product *= k
 	}
-	fmt.Println(minValue)
+	log.Printf("Part 2 result is time %d", min)
 }
 
 func part2BruteForce(input []string) {
