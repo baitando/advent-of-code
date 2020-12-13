@@ -86,28 +86,6 @@ func getLines(input string) []int {
 	return filtered
 }
 
-func getOffset(line int, definitions []string) int {
-	for offset, definition := range definitions {
-		if definition != "x" {
-			currentLine, err := strconv.Atoi(definition)
-			check(err)
-			if currentLine == line {
-				return offset
-			}
-		}
-	}
-	os.Exit(1)
-	return -1
-}
-
-func lowestMatch(line1 int, offset1 int, line2 int, offset2 int) int {
-	for i := 0; ; i++ {
-		if (i+offset1)%line1 == 0 && (i+offset2)%line2 == 0 {
-			return i
-		}
-	}
-}
-
 func part2(input []string) {
 	ids := make(map[int]int)
 	for offset, lineRaw := range strings.Split(input[1], ",") {
