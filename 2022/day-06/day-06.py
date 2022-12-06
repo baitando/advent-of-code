@@ -14,7 +14,7 @@ def all_distinct(lis):
 def get_unique_seq_index(data, length):
     for index in range(0, len(data) - length):
         if all_distinct(data[index:index + length]):
-            return index + 4
+            return index + length
 
 
 def part1():
