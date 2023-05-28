@@ -58,7 +58,6 @@ def part1(tgt_y):
 
 
 def part2(max_row):
-    # Work in progres...
     data = list(parse_input(read_lines()))
 
     beacons = set()
@@ -89,5 +88,5 @@ def part2(max_row):
     print("Part 2: ")
 
 
-part1(2000000)
-#part2(20)
+part1(10)
+part2(20)
